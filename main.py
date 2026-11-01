@@ -18,7 +18,7 @@ class NewUser(BaseModel):
 
 @app.get("чикибамбони")
 def home():
-    return{"msg": "Биржа работает"}
+    return{"msg": "Бир работает"}
 
 @app.post("/api/v1/public/register")
 def register(user: NewUser):
