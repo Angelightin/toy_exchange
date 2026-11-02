@@ -3,25 +3,32 @@ from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, Field
 from uuid import UUID, uuid4
 from secrets import token_urlsafe
+from typing import Literal
 
 app = FastAPI()
 users = {}
 balances = {}
+
+class UserRegisterResponse(BaseModel):
+    id: UUID
+    name: str
+    role: Literal["USER", "ADMIN"]
+    api_key: str
 
 class DepositBody(BaseModel):
     user_id: UUID
     ticker: str
     amount: int = Field(gt=0)
 
-class NewUser(BaseModel):
+class UserRegisterRequest(BaseModel):
     name: str = Field(min_length=3)
 
-@app.get("чикибамбони")
+@app.get("/")
 def home():
     return{"msg": "Биржа работает"}
 
-@app.post("/api/v1/public/register")
-def register(user: NewUser):
+@app.post("/api/v1/public/register", response_model=UserRegisterResponse, tags=["public"])
+def register(user: UserRegisterResponse):
     new_user =  {"id": str(uuid4()), 
             "name": user.name, 
             "role": "USER", 
