@@ -23,6 +23,20 @@ class DepositBody(BaseModel):
 class UserRegisterRequest(BaseModel):
     name: str = Field(min_length=3)
 
+class InstrumentResponse(BaseModel):
+    name: str
+    ticker: str = Field(pattern=r"^[A-Z]{2,10}$")
+
+class InstrumentCreateRequest(BaseModel):
+    name: str
+    ticker: str = Field(pattern=r"^[A-Z]{2,10}$")
+
+class InstrumentCreateResponse(BaseModel):
+    success: Literal[True] = True
+
+class InstrumentDeleteResponse(BaseModel):
+    success: Literal[True] = True
+
 @app.get("/")
 def home():
     return{"msg": "Биржа работает"}
@@ -68,3 +82,15 @@ def deposit(body: DepositBody, admin: dict = Depends(get_admin)):
         raise HTTPException(status_code=404, detail="Пользователь не найден")
     balances[user_id][body.ticker] = (balances[user_id].get(body.ticker, 0) + body.amount)
     return {"success": True}
+
+@app.get("/api/v1/public/instrument", response_model=list[InstrumentResponse],tags=["public"])
+def list_instruments():
+    raise HTTPException(status_code=501, detail="Метод пока не реализован")
+
+@app.post("/api/v1/admin/instrument", response_model=InstrumentCreateResponse)
+def add_instrument(body: InstrumentCreateRequest):
+    raise HTTPException(status_code=501, detail="Метод пока не реализован")
+
+@app.delete("/api/v1/admin/instrument/{ticker}", response_model=InstrumentDeleteResponse)
+def delete_instrument(ticker:str):
+    raise HTTPException(status_code = 501, detail="Метод пока не реализован")
