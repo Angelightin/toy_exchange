@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, Field
 from uuid import UUID, uuid4
@@ -37,12 +37,20 @@ class InstrumentCreateResponse(BaseModel):
 class InstrumentDeleteResponse(BaseModel):
     success: Literal[True] = True
 
+class OrderBookLevelResponse(BaseModel):
+    price: int
+    qty: int
+
+class OrderBookResponse(BaseModel):
+    bid_levels: list[OrderBookLevelResponse]
+    ask_levels: list[OrderBookLevelResponse]
+
 @app.get("/")
 def home():
     return{"msg": "Биржа работает"}
 
 @app.post("/api/v1/public/register", response_model=UserRegisterResponse, tags=["public"])
-def register(user: UserRegisterResponse):
+def register(user: UserRegisterRequest):
     new_user =  {"id": str(uuid4()), 
             "name": user.name, 
             "role": "USER", 
@@ -94,3 +102,7 @@ def add_instrument(body: InstrumentCreateRequest):
 @app.delete("/api/v1/admin/instrument/{ticker}", response_model=InstrumentDeleteResponse)
 def delete_instrument(ticker:str):
     raise HTTPException(status_code = 501, detail="Метод пока не реализован")
+
+@app.get("/api/v1/public/orderbook/{ticker}", response_model=OrderBookResponse, tags=["public"])
+def get_orderbook(ticker: str, limit: int = Query(default=10, le=25)):
+    raise HTTPException(status_code=501, detail="Метод пока не реализован")
